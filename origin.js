@@ -21,26 +21,26 @@ var COL_NUM = 10;
     定义全部的七种方块。前三种已经定义好。
     定义完之后，请把 PIECE_NUM 设置成 7，以启用所有的方块。
 */
-var PIECE_NUM = 3;
+var PIECE_NUM = 7;
 var bar = [[0, 0], [-1, 0], [1, 0], [2, 0]];
 var sevenShape = [[0, -1], [0, 0], [1, 0], [2, 0]];
 var square = [[0, 0], [1, 0], [0, 1], [1, 1]]
 /************************
     YOUR CODE STARTS
 *************************/
-var sevenShapeReversed = [];
-var hump = [];
-var zShape = [];
-var zShapeReversed = [];
+var sevenShapeReversed = [[-1, 0], [0, 0], [1, 0], [1, -1]];
+var hump = [[-1, 0], [0, 0], [0, 1], [1, 0]];
+var zShape = [[-1, 1], [0, 1], [0, 0], [1, 0]];
+var zShapeReversed = [[-1, 0], [0, 1], [0, 0], [1, 1]];
 /************************
     YOUR CODE ENDS
 *************************/
+
 
 var LAYOUTS = [square, bar, sevenShape, sevenShapeReversed, hump, zShape, zShapeReversed];
 var COLORS = ['red', 'blue', 'pink', 'purple', 'silver', 'orange', 'grey'];
 
 // 定义储存游戏板的二维数组，以存储方块的状态
-// 并初始化各项为 null
 var occupationMatrix = new Array(20);
 for (var i = 0; i < ROW_NUM; i++) {
     occupationMatrix[i] = new Array(COL_NUM);
@@ -74,7 +74,7 @@ function initializePiece(pieceTypeIdx) {
     /*
         在这个函数里，你需要返回一个 <div> 标签。
         你需要根据 pieceIdx，来从 LAYOUTS 这个变量中拿出对应的方块，
-
+ 
         提示：
         - 你可以使用 document.createElement 来生成 DOM
         - 你可以使用 DOM 变量的 .appendChild 方法来把其它 DOM 塞进去
@@ -87,7 +87,6 @@ function initializePiece(pieceTypeIdx) {
     var newPiece = document.createElement('div');
 
     newPiece.className = 'piece';
-    newPiece.layout = LAYOUTS[pieceTypeIdx]
 
     for (var i = 0; i < 4; i++) {
         var newBlock = document.createElement('div')
@@ -137,6 +136,36 @@ function setPosition(piece, row, col) {
     }
 }
 
+
+function pieceMoveDown() {
+    /*
+        每调用一次这个函数，当前的方块就会下落一格。
+        请完成这个函数里所有的下落逻辑。
+        提示：
+        - 可以尝试使用 setPosition 函数
+        - 先完成 isMoveDownValid 这个函数，来判断方块下落是否到底
+        - 落到底之后，务必把 piece 的 id 设置成空 (piece.id = "")，调用 check 函数检查游戏状态，然后再次调用 generatePiece，生成下一块 piece。
+    */
+
+    var piece = document.getElementById("currentPiece");
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    if (!isMoveDownValid(piece)) { // 如果这一个 piece 已经落到底了
+        updateOccupationMatrix(piece);
+        check();
+        piece.id = "";
+        generatePiece();
+    } else {
+        setPosition(piece, piece.rowPos + 1, piece.colPos);
+    }
+    /************************
+        YOUR CODE ENDS
+    *************************/
+
+}
+
 function updateOccupationMatrix(piece) {
     var blockList = piece.children;
     var targetCol, targetRow;
@@ -145,6 +174,99 @@ function updateOccupationMatrix(piece) {
         targetRow = blockList[idx].rowPos;
         occupationMatrix[targetRow][targetCol] = blockList[idx];
     }
+}
+
+function isMoveDownValid(piece) {
+    /*
+        如果方块可以继续下落，返回 True
+        否则返回 False	
+    */
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    var blockList = piece.children;
+    var isValidMove = true;
+
+    for (var idx = 0; idx < 4; idx++) {
+        var block = blockList[idx];
+        if ((block.rowPos + 1) >= ROW_NUM ||
+            occupationMatrix[block.rowPos + 1][block.colPos]) {
+            isValidMove = false;
+            break;
+        }
+    }
+
+    return isValidMove;
+    /************************
+        YOUR CODE ENDS
+    *************************/
+}
+
+
+function fallToBottom(piece) {
+    /**
+     * 这个函数会让方块一路落到最底
+     */
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    while (isMoveDownValid(piece)) {
+        pieceMoveDown();
+    }
+    /************************
+        YOUR CODE ENDS
+    *************************/
+
+}
+
+function rotateAntiClock(piece) {
+    /**
+     * 这个函数可以旋转当前方块
+     * 可能会用到一点线性代数的知识（百度：旋转矩阵）
+     * 拿笔和纸算一下就好啦～
+     * 感觉有难度的话请寻求帮助！
+     */
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    for (var i = 0; i < 4; i++) {
+        var newRow = (-1) * piece.layout[i][1];
+        var newCol = piece.layout[i][0];
+        piece.layout[i][0] = newRow;
+        piece.layout[i][1] = newCol;
+    }
+
+    setPosition(piece, piece.rowPos, piece.colPos);
+    /************************
+        YOUR CODE ENDS
+    *************************/
+}
+
+function rotateClock(piece) {
+    /**
+     * 这个函数可以旋转当前方块
+     * 可能会用到一点线性代数的知识（百度：旋转矩阵）
+     * 拿笔和纸算一下就好啦～
+     * 感觉有难度的话请寻求帮助！
+     */
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    for (var i = 0; i < 4; i++) {
+        var newCol = (-1) * piece.layout[i][0];
+        var newRow = piece.layout[i][1];
+        piece.layout[i][0] = newRow;
+        piece.layout[i][1] = newCol;
+    }
+
+    setPosition(piece, piece.rowPos, piece.colPos);
+    /************************
+        YOUR CODE ENDS
+    *************************/
 }
 
 function moveLeft(piece) {
@@ -156,6 +278,21 @@ function moveLeft(piece) {
     /************************
         YOUR CODE STARTS
     *************************/
+    var blockList = piece.children;
+    var isValidMove = true;
+
+    for (var idx = 0; idx < 4; idx++) {
+        var block = blockList[idx];
+        if ((block.colPos - 1) < 0 ||
+            occupationMatrix[block.rowPos][block.colPos - 1]) {
+            isValidMove = false;
+            break;
+        }
+    }
+
+    if (isValidMove) {
+        setPosition(piece, piece.rowPos, piece.colPos - 1);
+    }
     /************************
         YOUR CODE ENDS
     *************************/
@@ -170,91 +307,26 @@ function moveRight(piece) {
     /************************
         YOUR CODE STARTS
     *************************/
+    var blockList = piece.children;
+    var isValidMove = true;
+
+    for (var idx = 0; idx < 4; idx++) {
+        var block = blockList[idx];
+        if ((block.colPos + 1) >= COL_NUM ||
+            occupationMatrix[block.rowPos][block.colPos + 1]) {
+            isValidMove = false;
+            break;
+        }
+    }
+
+    if (isValidMove) {
+        setPosition(piece, piece.rowPos, piece.colPos + 1);
+    }
     /************************
         YOUR CODE ENDS
     *************************/
 }
 
-function pieceMoveDown() {
-    /*
-        每调用一次这个函数，当前的方块就会下落一格。
-        请完成这个函数里所有的下落逻辑。
-        提示：
-        - 可以尝试使用 setPosition 函数
-        - 先完成 isMoveDownValid 这个函数，来判断方块下落是否到底
-        - 落到底之后，务必把 piece 的 id 设置成空 (piece.id = "")，调用 check 函数检查游戏状态，然后再次调用 generatePiece，生成下一块 piece。
-    */
-
-    /************************
-        YOUR CODE STARTS
-    *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-
-}
-
-function fallToBottom(piece) {
-    /**
-     * 这个函数会让方块一路落到最底
-     * 调用 isMoveDownValid 判断是否可以下落
-     */
-
-    /************************
-        YOUR CODE STARTS
-    *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-}
-
-function isMoveDownValid(piece) {
-    /*
-        如果方块可以继续下落，返回 True
-        否则返回 False	
-    */
-
-    /************************
-        YOUR CODE STARTS
-    *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-}
-
-function rotateClock(piece) {
-    /**
-     * 这个函数可以顺时针旋转当前方块
-     * 可能会用到一点线性代数的知识（百度：旋转矩阵）
-     * 也可以用坐标系旋转理解（不懂抓 Kobe 来问）
-     * 拿笔和纸算一下就好啦～
-     * 感觉有难度的话请寻求帮助！
-     */
-
-    /************************
-        YOUR CODE STARTS
-    *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-}
-
-function rotateAntiClock(piece) {
-    /**
-     * 这个函数可以逆时针旋转当前方块
-     * 可能会用到一点线性代数的知识（百度：旋转矩阵）
-     * 也可以用坐标系旋转理解（不懂抓 Kobe 来问）
-     * 拿笔和纸算一下就好啦～
-     * 感觉有难度的话请寻求帮助！
-     */
-
-    /************************
-        YOUR CODE STARTS
-    *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-}
 
 function check() {
     /**
@@ -336,6 +408,20 @@ function clearRow(rowNumber) {
     /************************
         YOUR CODE STARTS
     *************************/
+    var targetParentNode, targetChildNode;
+
+    for (var idx = 0; idx < COL_NUM; idx++) {
+        if (occupationMatrix[rowNumber][idx]) {
+            targetChildNode = occupationMatrix[rowNumber][idx];
+            occupationMatrix[rowNumber][idx] = null;
+            targetParentNode = targetChildNode.parentNode;
+            targetParentNode.removeChild(targetChildNode);
+            // Remove empty div block
+            if (targetParentNode.children.length == 0) {
+                targetParentNode.parentNode.removeChild(targetParentNode);
+            }
+        }
+    }
     /************************
         YOUR CODE ENDS
     *************************/
@@ -381,6 +467,8 @@ function rowDown(rowNumber) {
 }
 
 document.onkeydown = function (event) {
+
+    var piece = document.getElementById("currentPiece");
     /**
      * 允许玩家使用键盘控制游戏。
      * 提示：可以使用 switch...case 语句。case 后跟的是键位对应的数值。具体数值可以问谷歌。
@@ -389,6 +477,28 @@ document.onkeydown = function (event) {
     /************************
         YOUR CODE STARTS
     *************************/
+    if (piece == null)
+        return;
+
+    switch (event.code) {
+        case "KeyA":
+            moveLeft(piece);
+            break;
+        case "KeyD":
+            moveRight(piece);
+            break;
+        case "KeyS":
+            fallToBottom(piece);
+            break;
+        case "KeyQ":
+            rotateAntiClock(piece);
+            break;
+        case "KeyE":
+            rotateClock(piece);
+            break;
+        default:
+            break;
+    }
     /************************
         YOUR CODE ENDS
     *************************/
@@ -406,14 +516,15 @@ function play() {
     /************************
         YOUR CODE STARTS
     *************************/
-    /************************
-        YOUR CODE ENDS
-    *************************/
-
+    cleanBoard();
+    generatePiece();
     // 每秒执行一次函数中的操作，比如下落
     window.a = setInterval(function () {
         pieceMoveDown();
     }, 1000)
+    /************************
+        YOUR CODE ENDS
+    *************************/
 
 }
 
