@@ -21,7 +21,7 @@ var COL_NUM = 10;
     定义全部的七种方块。前三种已经定义好。
     定义完之后，请把 PIECE_NUM 设置成 7，以启用所有的方块。
 */
-var PIECE_NUM = 1;
+var PIECE_NUM = 7;
 var bar = [[0, 0], [-1, 0], [1, 0], [2, 0]];
 var sevenShape = [[0, -1], [0, 0], [1, 0], [2, 0]];
 var square = [[0, 0], [1, 0], [0, 1], [1, 1]]
@@ -222,7 +222,7 @@ function fallToBottom(piece) {
 
 }
 
-function rotate(piece) {
+function rotateAntiClock(piece) {
     /**
      * 这个函数可以旋转当前方块
      * 可能会用到一点线性代数的知识（百度：旋转矩阵）
@@ -233,12 +233,43 @@ function rotate(piece) {
     /************************
         YOUR CODE STARTS
     *************************/
+    var oldLayout = piece.layout;
+    for (var i = 0; i < 4; i++) {
+        var newRow = (-1) * piece.layout[i][1];
+        var newCol = piece.layout[i][0];
+        piece.layout[i][0] = newRow;
+        piece.layout[i][1] = newCol;
+    }
 
-
+    setPosition(piece, piece.rowPos, piece.colPos);
     /************************
         YOUR CODE ENDS
     *************************/
+}
 
+function rotateClock(piece) {
+    /**
+     * 这个函数可以旋转当前方块
+     * 可能会用到一点线性代数的知识（百度：旋转矩阵）
+     * 拿笔和纸算一下就好啦～
+     * 感觉有难度的话请寻求帮助！
+     */
+
+    /************************
+        YOUR CODE STARTS
+    *************************/
+    var oldLayout = piece.layout;
+    for (var i = 0; i < 4; i++) {
+        var newCol = (-1) * piece.layout[i][0];
+        var newRow = piece.layout[i][1];
+        piece.layout[i][0] = newRow;
+        piece.layout[i][1] = newCol;
+    }
+
+    setPosition(piece, piece.rowPos, piece.colPos);
+    /************************
+        YOUR CODE ENDS
+    *************************/
 }
 
 function isMoveValid(piece) {
@@ -304,7 +335,6 @@ function moveRight(piece) {
     *************************/
     var blockList = piece.children;
     var isValidMove = true;
-    // console.log(blockList[0].rowPos + " " + blockList[0].colPos);
 
     for (var idx = 0; idx < 4; idx++) {
         var block = blockList[idx];
@@ -400,6 +430,7 @@ function clearRow(rowNumber) {
      * 你可以用一个 DOM 的 .parentNode 拿到它的母节点，然后用 .removeChild 方法将其子节点删去。
      * 提示：你需要把一行的所有 DOM 都拿出来，打破任何母子关系。
      */
+
     /************************
         YOUR CODE STARTS
     *************************/
@@ -486,10 +517,10 @@ document.onkeydown = function (event) {
             fallToBottom(piece);
             break;
         case "KeyQ":
-
+            rotateAntiClock(piece);
             break;
         case "KeyE":
-
+            rotateClock(piece);
             break;
         default:
             break;
@@ -516,7 +547,7 @@ function play() {
     // 每秒执行一次函数中的操作，比如下落
     window.a = setInterval(function () {
         pieceMoveDown();
-    }, 200)
+    }, 1000)
     /************************
         YOUR CODE ENDS
     *************************/
