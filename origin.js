@@ -55,11 +55,12 @@ function generatePiece() {
     var gameBoard = document.getElementById('gameBoard');
 
     // 随机获取一种方块
-    pieceIdx = Math.floor(PIECE_NUM * Math.random())
+    pieceTypeIdx = Math.floor(PIECE_NUM * Math.random())
 
     // 生成一个方块的 DOM （其实是 HTML 中的一个 <div> 标签）
     // getPiece 这个函数是需要被完善的 (内部的 blockList 和其他 attributes 的实现)
-    var newPiece = initializePiece(pieceIdx);
+    var newPiece = initializePiece(pieceTypeIdx);
+    newPiece.layout = LAYOUTS[pieceTypeIdx];
 
     // 将这个 piece 挂到 gameBoard 内容板里
     newPiece.id = "currentPiece";
